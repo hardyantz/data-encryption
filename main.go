@@ -24,7 +24,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	db := ConnectDB()
+	db := conn.ConnectDB()
 	conf := config.NewConfImpl()
 
 	cacheExpire := 1 * time.Hour
