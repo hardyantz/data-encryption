@@ -2,3 +2,4 @@ config/rsa/db.rsa
 config/rsa/db.rsa.pub
 .idea
 .env
+data-encryption

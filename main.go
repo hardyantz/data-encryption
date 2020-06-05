@@ -19,7 +19,7 @@ import (
 func main() {
 	e := echo.New()
 
-	if err := Load(".env"); err != nil {
+	if err := config.Load(".env"); err != nil {
 		fmt.Println(err)
 		os.Exit(2)
 	}
