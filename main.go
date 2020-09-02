@@ -10,6 +10,9 @@ import (
 	memberDelivery "github.com/hardyantz/data-encryption/pkg/member/delivery"
 	memberRepository "github.com/hardyantz/data-encryption/pkg/member/repository"
 	memberUseCase "github.com/hardyantz/data-encryption/pkg/member/usecase"
+	memberAesDelivery "github.com/hardyantz/data-encryption/pkg/member-aes/delivery"
+	memberAesRepository "github.com/hardyantz/data-encryption/pkg/member-aes/repository"
+	memberAesUseCase "github.com/hardyantz/data-encryption/pkg/member-aes/usecase"
 	userDelivery "github.com/hardyantz/data-encryption/pkg/user/delivery"
 	userRepository "github.com/hardyantz/data-encryption/pkg/user/repository"
 	userUseCase "github.com/hardyantz/data-encryption/pkg/user/usecase"
@@ -31,18 +34,24 @@ func main() {
 
 	redis := config.NewCacheRedis(conn.RedisConnect(), cacheExpire)
 
-	memberRepo := memberRepository.NewMemberRepoImplementation(db, conf, redis)
-	memberUc := memberUseCase.NewMemberImplementation(memberRepo)
+	memberRepo := memberRepository.NewMemberRepository(db, conf, redis)
+	memberUc := memberUseCase.NewMemberUseCase(memberRepo)
 	memberHandler := memberDelivery.NewHTTPHandler(memberUc)
 
 	userRepo := userRepository.NewUserImplementation(db, conf)
 	userUc := userUseCase.NewUserImplementation(userRepo)
 	userHandler := userDelivery.NewHTTPHandler(userUc)
 
+	memberAesRepo := memberAesRepository.NewMemberRepository(db, conf, redis)
+	memberAesUc := memberAesUseCase.NewMemberUseCase(memberAesRepo)
+	memberAesHandler := memberAesDelivery.NewHTTPHandler(memberAesUc)
+
 	member := e.Group("/member")
 	memberHandler.Mount(member)
 	user := e.Group("/user")
 	userHandler.Mount(user)
+	memberAes := e.Group("/member-aes")
+	memberAesHandler.Mount(memberAes)
 
 	e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }

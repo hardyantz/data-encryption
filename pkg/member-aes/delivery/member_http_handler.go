@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/hardyantz/data-encryption/helpers"
-	"github.com/hardyantz/data-encryption/pkg/member/domain"
-	"github.com/hardyantz/data-encryption/pkg/member/usecase"
+	"github.com/hardyantz/data-encryption/pkg/member-aes/domain"
+	"github.com/hardyantz/data-encryption/pkg/member-aes/usecase"
 	"github.com/labstack/echo"
 )
 

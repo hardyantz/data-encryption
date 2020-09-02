@@ -12,17 +12,17 @@ import (
 	"github.com/hardyantz/data-encryption/pkg/member/domain"
 )
 
-type MemberRepoImplementation interface {
+type MemberRepository interface {
 	Create(member *domain.Member) error
-	GetAll(domain.Parameters) ([]domain.Member, error)
+	GetAll(params domain.Parameters) ([]domain.Member, error)
 	GetOne(id string) (*domain.Member, error)
 	GetOneEmail(email string) (*domain.Member, error)
-	Update(id string, member domain.Member) error
+	Update(id string, member *domain.Member) error
 	Delete(id string) error
 	GetEmailLogin(email string) (*domain.Member, error)
 }
 
-type MemberRepositoryMongo struct {
+type memberRepository struct {
 	db    *sql.DB
 	conf  *config.Config
 	redis *config.Redis
@@ -30,11 +30,11 @@ type MemberRepositoryMongo struct {
 
 var cacheExpired = 1 * time.Hour
 
-func NewMemberRepoImplementation(db *sql.DB, conf *config.Config, redis *config.Redis) *MemberRepositoryMongo {
-	return &MemberRepositoryMongo{db, conf, redis}
+func NewMemberRepository(db *sql.DB, conf *config.Config, redis *config.Redis) MemberRepository {
+	return &memberRepository{db, conf, redis}
 }
 
-func (r *MemberRepositoryMongo) Create(member *domain.Member) error {
+func (r *memberRepository) Create(member *domain.Member) error {
 
 	member.GenID()
 	query := fmt.Sprintf(`INSERT INTO members(
@@ -56,7 +56,7 @@ func (r *MemberRepositoryMongo) Create(member *domain.Member) error {
 	return nil
 }
 
-func (r *MemberRepositoryMongo) GetAll(params domain.Parameters) ([]domain.Member, error) {
+func (r *memberRepository) GetAll(params domain.Parameters) ([]domain.Member, error) {
 	var (
 		members []domain.Member
 		err     error
@@ -107,7 +107,7 @@ func (r *MemberRepositoryMongo) GetAll(params domain.Parameters) ([]domain.Membe
 	return members, err
 }
 
-func (r *MemberRepositoryMongo) GetOne(id string) (*domain.Member, error) {
+func (r *memberRepository) GetOne(id string) (*domain.Member, error) {
 	member := new(domain.Member)
 
 	getRedis := r.redis.Get(id)
@@ -131,7 +131,7 @@ func (r *MemberRepositoryMongo) GetOne(id string) (*domain.Member, error) {
 	return member, err
 }
 
-func (r *MemberRepositoryMongo) GetOneEmail(email string) (*domain.Member, error) {
+func (r *memberRepository) GetOneEmail(email string) (*domain.Member, error) {
 	member := new(domain.Member)
 
 	getRedis := r.redis.Get(email)
@@ -152,7 +152,7 @@ func (r *MemberRepositoryMongo) GetOneEmail(email string) (*domain.Member, error
 	return member, err
 }
 
-func (r *MemberRepositoryMongo) Update(id string, member *domain.Member) error {
+func (r *memberRepository) Update(id string, member *domain.Member) error {
 	query := fmt.Sprintf(`UPDATE members SET
 	"first_name" = '%s', 
 	"last_name" = '%s', 
@@ -184,7 +184,7 @@ func (r *MemberRepositoryMongo) Update(id string, member *domain.Member) error {
 	return nil
 }
 
-func (r *MemberRepositoryMongo) Delete(id string) error {
+func (r *memberRepository) Delete(id string) error {
 	member, err := r.GetOne(id)
 	if err != nil {
 		return err
@@ -198,7 +198,7 @@ func (r *MemberRepositoryMongo) Delete(id string) error {
 	return nil
 }
 
-func (r *MemberRepositoryMongo) GetEmailLogin(email string) (*domain.Member, error) {
+func (r *memberRepository) GetEmailLogin(email string) (*domain.Member, error) {
 	member := new(domain.Member)
 
 	getRedis := r.redis.Get(email)

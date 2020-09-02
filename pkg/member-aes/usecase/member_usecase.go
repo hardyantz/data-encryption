@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"github.com/hardyantz/data-encryption/pkg/member/domain"
-	repository "github.com/hardyantz/data-encryption/pkg/member/repository"
+	"github.com/hardyantz/data-encryption/pkg/member-aes/domain"
+	"github.com/hardyantz/data-encryption/pkg/member-aes/repository"
 )
 
 type MemberUseCase interface {
